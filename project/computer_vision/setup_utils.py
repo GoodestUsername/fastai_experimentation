@@ -3,17 +3,13 @@
 Followed this guide with some modifications:
 https://www.kaggle.com/code/jhoward/is-it-a-bird-creating-a-model-from-your-own-data/notebook
 """
-import random
-
 from pathlib import Path
 from time import sleep
-
 from itertools import islice
-from PIL import Image
+
 from duckduckgo_search import DDGS
 from fastcore.foundation import L
 
-from fastai.vision.core import PILImage
 from fastai.vision.utils import download_images, verify_images, resize_images
 from fastai.data.transforms import get_image_files
 
@@ -50,22 +46,6 @@ def delete_failed_images(images_path):
         return -1
 
 
-def create_category_directories(categories, path):
-    """ Create directories for each category in the specified base path.
-
-    :param categories: A list of category names (strings).
-    :param path: Path object containing the base directory where the category directories will be created.
-    :return: True for success, return none for exception
-    """
-    try:
-        for category in categories:
-            category_path = path / 'images' / category
-            category_path.mkdir(exist_ok=True, parents=True)
-        return True
-    except PermissionError:
-        return None
-
-
 def download_images_for_categories(category_paths, subjects, max_size=400):
     """
     Download images from DuckDuckGo for the specified categories and subjects to the specified paths.
@@ -80,32 +60,22 @@ def download_images_for_categories(category_paths, subjects, max_size=400):
             download_images(category_path, urls=found_urls)
             sleep(10)
         resize_images(category_path, max_size=max_size, dest=category_path)
+        delete_failed_images(category_path)
 
 
-def test_random_image(learn, test_set_path: Path):
+def create_category_directories(categories, path):
+    """ Create directories for each category in the specified base path.
+
+    :param categories: A list of category names (strings).
+    :param path: Path object containing the base directory where the category directories will be created.
+    :return: Dictionary containing the categories as keys and paths as values, return none for exception
     """
-    Randomly selects an image from the test set, predicts its label, and displays the image.
-
-    :param learn: Fastai Learner object.
-    :param test_set_path: Path object of the directory containing the test set images.
-    :return: Tuple with label, label_index, probabilities list, return -1 if no images found in the directory.
-    """
-    image_paths = list(test_set_path.glob("*"))
-    if not image_paths:
-        print("No images found in the specified directory.")
-        return -1
-
-    random_image_path = random.choice(image_paths)
-    print(f"File name: {random_image_path}.")
-
-    pil_image = PILImage.create(random_image_path)
-    label, label_index, probabilities = learn.predict(pil_image)
-
-    print(f"This is a: {label}.")
-    print(f"Probabilities: {probabilities}")
-    print(f"Label index: {label_index}")
-
-    im = Image.open(random_image_path)
-    im.show()
-
-    return label, label_index, probabilities
+    try:
+        categories_paths_dict = {}
+        for category in categories:
+            category_path = path / 'images' / category
+            category_path.mkdir(exist_ok=True, parents=True)
+            categories_paths_dict[category] = category_path
+        return categories_paths_dict
+    except PermissionError:
+        return None
