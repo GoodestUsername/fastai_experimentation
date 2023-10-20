@@ -4,7 +4,6 @@ Followed this guide with some modifications:
 https://www.kaggle.com/code/jhoward/is-it-a-bird-creating-a-model-from-your-own-data/notebook
 """
 import random
-import glob
 
 from pathlib import Path
 from time import sleep
@@ -18,13 +17,11 @@ from fastai.vision.core import PILImage
 from fastai.vision.utils import download_images, verify_images, resize_images
 from fastai.data.transforms import get_image_files
 
-import torch
-
 
 def search_images(term, max_images=30):
     """ Search term and return list of urls from duckduckgo with an optional max amount.
 
-    :author mango: https://www.kaggle.com/mrmangoes
+    author mango: https://www.kaggle.com/mrmangoes
     :param term: String term to search.
     :param max_images: Maximum number of images to search (default is 30)
     :return: List of string urls of images of the term
@@ -85,15 +82,15 @@ def download_images_for_categories(category_paths, subjects, max_size=400):
         resize_images(category_path, max_size=max_size, dest=category_path)
 
 
-def test_random_image(learn, testset_path: Path):
+def test_random_image(learn, test_set_path: Path):
     """
     Randomly selects an image from the test set, predicts its label, and displays the image.
 
     :param learn: Fastai Learner object.
-    :param testset_path: Path object of the directory containing the test set images.
+    :param test_set_path: Path object of the directory containing the test set images.
     :return: Tuple with label, label_index, probabilities list, return -1 if no images found in the directory.
     """
-    image_paths = list(testset_path.glob("*"))
+    image_paths = list(test_set_path.glob("*"))
     if not image_paths:
         print("No images found in the specified directory.")
         return -1
