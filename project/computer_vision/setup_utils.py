@@ -73,9 +73,27 @@ def create_category_directories(categories, path):
     try:
         categories_paths_dict = {}
         for category in categories:
-            category_path = path / 'images' / category
+            category_path = path / category
             category_path.mkdir(exist_ok=True, parents=True)
             categories_paths_dict[category] = category_path
         return categories_paths_dict
     except PermissionError:
         return None
+
+
+def path_contains_images(path):
+    """ Check if directory contains image files (.jpg, .png, .jpeg, .gif, .bmp)
+
+    :param path: Path object containing the directory of the images
+    :return: True if any images in path
+    """
+    return any(file.suffix.lower() in {'.jpg', '.png', '.jpeg', '.gif', '.bmp'} for file in path.glob('*'))
+
+
+def is_images_setup(paths):
+    """ Checks paths to see if the images are already setup
+
+    :param paths: List of Path objects containing the directory of the category to check for images
+    :return: True if every directory has images false if not
+    """
+    return all(path_contains_images(path) for path in paths)
