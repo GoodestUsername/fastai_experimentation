@@ -5,7 +5,14 @@
       <excludeFolder url="file://$MODULE_DIR$/fastai_venv" />
       <excludeFolder url="file://$MODULE_DIR$/project/computer_vision/images" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (fastai_experimentation) (2)" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PyDocumentationSettings">
+    <option name="format" value="PLAIN" />
+    <option name="myDocStringFormat" value="Plain" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="py.test" />
   </component>
 </module>

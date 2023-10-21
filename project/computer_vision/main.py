@@ -45,8 +45,8 @@ def test_random_image(learn, test_set_path):
 def bird_vs_forest_model(models_path):
     """ Finetune resnet18 for bird vs forest labels.
 
-    :param models_path: Path object for models directory to save fine tuned model.
-    :return: Fastai Learner object.
+    :param models_path: Path object for models directory to save fine-tuned model.
+    :return: Tuple with Fastai Learner object, dictionary of category image paths.
     """
     images_path = Path('./images')
 
@@ -76,6 +76,39 @@ def bird_vs_forest_model(models_path):
     return learn, category_paths
 
 
+def cat_vs_dog_label_func(animal):
+    """ Return label of the prediction.
+
+    :param animal: Fastai predict output of the image given.
+    :return: label in uppercase
+    """
+    return animal[0].upper()
+
+
+def cat_vs_dog_model(models_path):
+    """ Finetune the resnet32 model for cats vs dog labels
+
+    :return: Fastai Learner object
+    """
+
+    path = untar_data(URLs.PETS) / 'images'
+    dls = ImageDataLoaders.from_name_func(
+        models_path,
+        get_image_files(path),
+        valid_pct=0.2,
+        seed=42,
+        label_func=cat_vs_dog_label_func,
+        item_tfms=Resize(224),
+        batch_tfms=aug_transforms(size=224, min_scale=0.75),
+        num_workers=0
+    )
+
+    learn = vision_learner(dls, resnet34, metrics=error_rate, model_dir=models_path)
+    learn.fine_tune(1)
+    learn.export('cat_vs_dog1.pkl')
+    return learn
+
+
 def main():
     """Driver function
 
@@ -87,8 +120,7 @@ def main():
     print(f'Current OS: {os_name}')
 
     model_path = Path('./models')
-    birds_vs_forests_model, category_paths = bird_vs_forest_model(model_path)
-    test_random_image(birds_vs_forests_model, category_paths['bird'])
+    cats_vs_dogs_model = cat_vs_dog_model(model_path)
     return 0
 
 
