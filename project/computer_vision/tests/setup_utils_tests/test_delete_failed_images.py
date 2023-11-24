@@ -36,25 +36,19 @@ class TestDeleteFailedImages(unittest.TestCase):
         shutil.rmtree(self.test_dir_good_and_bad_images, ignore_errors=True)
 
     def test_delete_failed_images_no_images(self):
-        """
-        Test for no images in folder
-        """
+        """Test for no images in folder"""
         result = delete_failed_images(self.test_dir_no_images)
         self.assertEqual(0, result)
 
     def test_delete_failed_images_with_only_good_images(self):
-        """
-        Test for all good images in folder
-        """
+        """Test for all good images in folder"""
         for good_image in glob.iglob(os.path.join(TestDeleteFailedImages.sample_good_image_path, '*.jpg')):
             shutil.copy(good_image, self.test_dir_good_images)
         result = delete_failed_images(self.test_dir_good_images)
         self.assertEqual(0, result)
 
     def test_delete_failed_images_with_only_bad_images(self):
-        """
-        Test for all bad images in folder
-        """
+        """Test for all bad images in folder"""
         self.test_bad_images = [
             self.test_dir_bad_images / "image1.jpg",
             self.test_dir_bad_images / "image2.jpg",
@@ -66,9 +60,7 @@ class TestDeleteFailedImages(unittest.TestCase):
         self.assertEqual(3, result)
 
     def test_delete_failed_images_with_both_good_and_bad_images(self):
-        """
-        Test for both good and bad images in folder
-        """
+        """Test for both good and bad images in folder"""
         self.test_bad_images = [
             self.test_dir_good_and_bad_images / "image1.jpg",
             self.test_dir_good_and_bad_images / "image2.jpg",
