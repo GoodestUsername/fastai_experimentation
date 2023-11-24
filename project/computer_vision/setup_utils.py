@@ -38,7 +38,7 @@ def delete_failed_images(images_path):
     """
     try:
         failed = verify_images(get_image_files(images_path))
-        failed.map(Path.unlink)
+        failed.map(Path.unlink, missing_ok=True)
         num_failed = len(failed)
         print(f'Failed images: {num_failed}')
         return num_failed
