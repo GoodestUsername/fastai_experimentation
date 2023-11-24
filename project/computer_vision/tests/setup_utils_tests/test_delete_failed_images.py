@@ -28,7 +28,7 @@ class TestDeleteFailedImages(unittest.TestCase):
 
     def tearDown(self):
         """
-        Remove test image directories and their filees.
+        Remove test image directories and their files.
         """
         shutil.rmtree(self.test_dir_no_images, ignore_errors=True)
         shutil.rmtree(self.test_dir_good_images, ignore_errors=True)
