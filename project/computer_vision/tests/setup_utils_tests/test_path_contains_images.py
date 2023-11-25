@@ -11,7 +11,7 @@ class TestPathContainsImages(unittest.TestCase):
         self.test_base_directory = Path('test_path_contains_test_directory')
 
     def tearDown(self):
-        """Remove test image directories and their files. """
+        """Remove test image directories and their files."""
         shutil.rmtree(self.test_base_directory, ignore_errors=True)
 
     def test_nonexistent_directory(self):
@@ -62,6 +62,34 @@ class TestPathContainsImages(unittest.TestCase):
         (test_path / "test2.png").touch()
         (test_path / "test3.gif").touch()
         self.assertTrue(path_contains_images(test_path))
+
+    def test_images_in_nested_folders(self):
+        """Test if the function correctly identifies images in nested folders"""
+        base_dir = self.test_base_directory / "nested/folders"
+        base_dir.mkdir(parents=True, exist_ok=True)
+
+        nested_dir1 = base_dir / "nested1"
+        nested_dir1.mkdir()
+        (nested_dir1 / "image1.jpg").touch()
+
+        nested_dir2 = base_dir / "nested2"
+        nested_dir2.mkdir()
+        (nested_dir2 / "image2.png").touch()
+
+        self.assertTrue(path_contains_images(base_dir))
+
+    def test_no_images_in_nested_folders(self):
+        """Test when there are no images in nested folders"""
+        base_dir = self.test_base_directory / "nested/folders/no_images"
+        base_dir.mkdir(parents=True, exist_ok=True)
+
+        nested_dir1 = base_dir / "nested1"
+        nested_dir1.mkdir()
+
+        nested_dir2 = base_dir / "nested2"
+        nested_dir2.mkdir()
+
+        self.assertFalse(path_contains_images(base_dir))
 
 
 if __name__ == '__main__':
