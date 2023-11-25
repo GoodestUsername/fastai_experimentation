@@ -2,6 +2,8 @@
 import os.path
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+
 from project.computer_vision.setup_utils import delete_failed_images
 import shutil
 import glob
@@ -34,6 +36,20 @@ class TestDeleteFailedImages(unittest.TestCase):
         shutil.rmtree(self.test_dir_good_images, ignore_errors=True)
         shutil.rmtree(self.test_dir_bad_images, ignore_errors=True)
         shutil.rmtree(self.test_dir_good_and_bad_images, ignore_errors=True)
+
+    @patch('pathlib.Path.unlink')
+    def test_delete_failed_images_permission_error(self, mock_unlink):
+        """Test for no images in folder"""
+        self.test_bad_images = [
+            self.test_dir_bad_images / "image1.jpg",
+            self.test_dir_bad_images / "image2.jpg",
+            self.test_dir_bad_images / "image3.jpg"
+        ]
+        for file in self.test_bad_images:
+            file.touch()
+        mock_unlink.side_effect = PermissionError('Unit test delete image perm error.')
+        result = delete_failed_images(self.test_dir_bad_images)
+        self.assertEqual(-1, result)
 
     def test_delete_failed_images_no_images(self):
         """Test for no images in folder"""
