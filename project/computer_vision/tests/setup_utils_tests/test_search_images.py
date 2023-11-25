@@ -1,7 +1,7 @@
 """Module contains tests for search_images"""
 import unittest
 from unittest.mock import patch
-from project.computer_vision.setup_utils import search_images  # Replace 'your_module' with the actual module name
+from project.computer_vision.setup_utils import search_images
 from fastcore.foundation import L
 
 

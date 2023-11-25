@@ -1,8 +1,9 @@
+"""Module contains tests for setting up category directories"""
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-
 from project.computer_vision.setup_utils import create_category_directories
+
 
 class TestCreateCategoryDirectories(unittest.TestCase):
     def setUp(self):
