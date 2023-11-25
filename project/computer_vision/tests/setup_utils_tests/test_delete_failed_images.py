@@ -13,9 +13,7 @@ class TestDeleteFailedImages(unittest.TestCase):
     sample_good_image_path = Path('good_images')
 
     def setUp(self):
-        """
-        Setup test image directories.
-        """
+        """Setup test image directories."""
         self.test_dir_no_images = Path("test_no_images")
         self.test_dir_no_images.mkdir(parents=True, exist_ok=True)
 
@@ -29,9 +27,7 @@ class TestDeleteFailedImages(unittest.TestCase):
         self.test_dir_good_and_bad_images.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self):
-        """
-        Remove test image directories and their files.
-        """
+        """Remove test image directories and their files. """
         shutil.rmtree(self.test_dir_no_images, ignore_errors=True)
         shutil.rmtree(self.test_dir_good_images, ignore_errors=True)
         shutil.rmtree(self.test_dir_bad_images, ignore_errors=True)

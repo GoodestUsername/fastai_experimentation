@@ -7,12 +7,12 @@ from project.computer_vision.setup_utils import create_category_directories
 
 class TestCreateCategoryDirectories(unittest.TestCase):
     def setUp(self):
-        # Create a temporary directory for testing
+        """Create a temporary directory for testing"""
         self.test_base_path = Path("test_base")
         self.test_base_path.mkdir(parents=True, exist_ok=True)
 
     def tearDown(self):
-        # Remove the temporary directory and its contents after each test
+        """Remove the temporary directory and its contents after each test"""
         for child in self.test_base_path.iterdir():
             if child.is_dir():
                 child.rmdir()

@@ -82,12 +82,15 @@ def create_category_directories(categories, path):
 
 
 def path_contains_images(path):
-    """ Check if directory contains image files (.jpg, .png, .jpeg, .gif, .bmp)
+    """ Check if given directory contains image files at that directory level (.jpg, .png, .jpeg, .gif, .bmp)
 
     :param path: Path object containing the directory of the images
     :return: True if any images in path
     """
-    return any(file.suffix.lower() in {'.jpg', '.png', '.jpeg', '.gif', '.bmp'} for file in path.glob('*'))
+    try:
+        return any(file.suffix.lower() in {'.jpg', '.png', '.jpeg', '.gif', '.bmp'} for file in path.glob('*'))
+    except FileNotFoundError:
+        return False
 
 
 def is_images_setup(paths):
