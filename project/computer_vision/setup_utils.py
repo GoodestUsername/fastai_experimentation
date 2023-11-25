@@ -88,7 +88,7 @@ def path_contains_images(path):
     :return: True if any images in path
     """
     try:
-        return any(file.suffix.lower() in {'.jpg', '.png', '.jpeg', '.gif', '.bmp'} for file in path.glob('*'))
+        return any(file.suffix.lower() in {'.jpg', '.png', '.jpeg', '.gif', '.bmp'} for file in path.rglob('*'))
     except FileNotFoundError:
         return False
 
