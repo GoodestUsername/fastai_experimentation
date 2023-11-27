@@ -46,7 +46,7 @@ def delete_failed_images(images_path):
         return -1
 
 
-def download_images_for_categories(category_paths, subjects, max_size=400):
+def download_images_for_categories(category_paths, subjects=None, max_size=400):
     """
     Download images from DuckDuckGo for the specified categories and subjects to the specified paths.
 
@@ -54,6 +54,8 @@ def download_images_for_categories(category_paths, subjects, max_size=400):
     :param subjects: List of subjects to search for.
     :param max_size: Maximum image size (default is 400).
     """
+    if subjects is None:
+        subjects = []
     for category, category_path in category_paths.items():
         if (len(subjects)) > 0:
             for subject in subjects:
