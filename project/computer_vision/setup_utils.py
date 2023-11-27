@@ -55,8 +55,13 @@ def download_images_for_categories(category_paths, subjects, max_size=400):
     :param max_size: Maximum image size (default is 400).
     """
     for category, category_path in category_paths.items():
-        for subject in subjects:
-            found_urls = search_images(f'{category} {subject}')
+        if (len(subjects)) > 0:
+            for subject in subjects:
+                found_urls = search_images(f'{category} {subject}')
+                download_images(category_path, urls=found_urls)
+                sleep(10)
+        else:
+            found_urls = search_images(category)
             download_images(category_path, urls=found_urls)
             sleep(10)
         resize_images(category_path, max_size=max_size, dest=category_path)
