@@ -77,6 +77,7 @@ def download_images_for_categories(category_paths, subjects=None, max_size=400):
         """
         found_urls = search_images(f'{primary}{"" if len(secondary) else " "}{secondary}')
         image_urls = [url for url in found_urls if is_url_image(url)]
+        print(f'Downloading {len(image_urls)} images.')
         download_images(category_path, urls=image_urls)
         sleep(10)
 
