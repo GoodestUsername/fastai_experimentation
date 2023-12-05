@@ -12,6 +12,7 @@ from fastcore.foundation import L
 
 from fastai.vision.utils import download_images, verify_images, resize_images
 from fastai.data.transforms import get_image_files
+from requests.exceptions import SSLError
 
 
 def search_images(term, max_images=30):
@@ -54,7 +55,10 @@ def is_url_image(image_url) -> bool:
     :return: Boolean, if the url has content-type image.
     """
     image_formats = ("image/png", "image/jpeg", "image/jpg", "image/jpg!d")
-    return requests.head(image_url).headers.get("content-type") in image_formats
+    try:
+        return requests.head(image_url).headers.get("content-type") in image_formats
+    except:
+        return False
 
 
 def download_images_for_categories(category_paths, subjects=None, max_size=400):
@@ -73,7 +77,7 @@ def download_images_for_categories(category_paths, subjects=None, max_size=400):
         """
         found_urls = search_images(f'{primary}{"" if len(secondary) else " "}{secondary}')
         image_urls = [url for url in found_urls if is_url_image(url)]
-        download_images(category_path, urls=found_urls)
+        download_images(category_path, urls=image_urls)
         sleep(10)
 
     if subjects is None:
