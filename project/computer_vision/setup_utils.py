@@ -14,7 +14,7 @@ from fastai.vision.utils import download_images, verify_images, resize_images
 from fastai.data.transforms import get_image_files
 
 
-def search_images(term, max_images=30):
+def search_images(term, max_images=128):
     """ Search term and return list of urls from duckduckgo with an optional max amount.
 
     author mango: https://www.kaggle.com/mrmangoes
