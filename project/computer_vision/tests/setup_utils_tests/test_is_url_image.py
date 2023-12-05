@@ -48,6 +48,14 @@ class TestIsUrlImage(unittest.TestCase):
             mock_head.return_value = mock_response_non_image
             self.assertFalse(is_url_image('https://example.com/page.html'))
 
+    def test_image_url_valid_url_header_no_content_type_key(self):
+        """Mock the requests head function to simulate image and non-image url."""
+        with patch('requests.head') as mock_head:
+            mock_response_non_image = MagicMock()
+            mock_response_non_image.headers = {"a": "b"}
+            mock_head.return_value = mock_response_non_image
+            self.assertFalse(is_url_image('https://example.com/page.html'))
+
     def test_invalid_url(self):
         """Mock the requests head function to simulate a request error for an invalid URL."""
         with patch('requests.head') as mock_head:

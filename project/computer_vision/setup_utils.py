@@ -54,7 +54,7 @@ def is_url_image(image_url) -> bool:
     :return: Boolean, if the url has content-type image.
     """
     image_formats = ("image/png", "image/jpeg", "image/jpg", "image/jpg!d")
-    return requests.head(image_url).headers["content-type"] in image_formats
+    return requests.head(image_url).headers.get("content-type") in image_formats
 
 
 def download_images_for_categories(category_paths, subjects=None, max_size=400):
