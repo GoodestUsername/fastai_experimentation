@@ -12,7 +12,6 @@ from fastcore.foundation import L
 
 from fastai.vision.utils import download_images, verify_images, resize_images
 from fastai.data.transforms import get_image_files
-from requests.exceptions import SSLError
 
 
 def search_images(term, max_images=30):
