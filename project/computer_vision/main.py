@@ -13,7 +13,7 @@ from torchvision.models import resnet18
 from setup_utils import create_category_directories, download_images_for_categories, is_images_setup
 
 
-def test_random_image(learn, test_set_path):
+def try_random_image(learn, test_set_path):
     """
     Randomly selects an image from the test set, predicts its label, and displays the image.
 
@@ -109,6 +109,41 @@ def cat_vs_dog_model(models_path):
     return learn
 
 
+def bear_model_random_resized_crop():
+    """ Finetune the resnet32 model for types of bears, grizzly, black, teddy labels
+
+    :return: Fastai Learner object
+    """
+
+    images_path = Path('./images/bear')
+    images_path.mkdir(exist_ok=True, parents=True)
+    categories = ['grizzly', 'black', 'teddy']
+    category_paths = create_category_directories(categories, images_path)
+
+    if is_images_setup(category_paths.values()):
+        print("images already downloaded")
+    else:
+        print("downloading images from duckduckgo")
+        download_images_for_categories(category_paths)
+
+    bears = DataBlock(
+        blocks=[ImageBlock, CategoryBlock],
+        get_items=get_image_files,
+        splitter=RandomSplitter(seed=42),
+        get_y=parent_label,
+        item_tfms=[Resize(192)],
+        batch_tfms=aug_transforms(size=192, min_scale=0.75)
+    )
+    bears = bears.new(item_tfms=[RandomResizedCrop(128, min_scale=0.3)])
+    dls = bears.dataloaders(images_path)
+    dls.train.show_batch(max_n=4, nrows=1, unique=True)
+    # dls = bears.dataloaders(images_path)
+    # learn = vision_learner(dls, resnet34, metrics=error_rate, model_dir=models_path)
+    # learn.fine_tune(1)
+    # learn.export('cat_vs_dog1.pkl')
+    # return learn
+
+
 def main():
     """Driver function
 
@@ -120,7 +155,7 @@ def main():
     print(f'Current OS: {os_name}')
 
     model_path = Path('./models')
-    cats_vs_dogs_model = cat_vs_dog_model(model_path)
+    bear_model_random_resized_crop()
     return 0
 
 
