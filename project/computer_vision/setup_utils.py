@@ -65,18 +65,25 @@ def download_images_for_categories(category_paths, subjects=None, max_size=400):
     :param subjects: List of subjects to search for.
     :param max_size: Maximum image size (default is 400).
     """
+
+    def download(primary, secondary=""):
+        """
+        :param primary: Primary search string, placed in front.
+        :param secondary: (Optional) Secondary search string, placed in back.
+        """
+        found_urls = search_images(f'{primary}{"" if len(secondary) else " "}{secondary}')
+        image_urls = [url for url in found_urls if is_url_image(url)]
+        download_images(category_path, urls=found_urls)
+        sleep(10)
+
     if subjects is None:
         subjects = []
     for category, category_path in category_paths.items():
         if (len(subjects)) > 0:
             for subject in subjects:
-                found_urls = search_images(f'{category} {subject}')
-                download_images(category_path, urls=found_urls)
-                sleep(10)
+                download(category, subject)
         else:
-            found_urls = search_images(category)
-            download_images(category_path, urls=found_urls)
-            sleep(10)
+            download(category)
         resize_images(category_path, max_size=max_size, dest=category_path)
         delete_failed_images(category_path)
 
