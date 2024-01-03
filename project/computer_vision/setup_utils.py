@@ -3,19 +3,20 @@
 Followed this guide with some modifications:
 https://www.kaggle.com/code/jhoward/is-it-a-bird-creating-a-model-from-your-own-data/notebook
 """
+from itertools import islice
 from pathlib import Path
 from time import sleep
-from itertools import islice
+
 import requests
 from duckduckgo_search import DDGS
-from fastcore.foundation import L
-
-from fastai.vision.utils import download_images, verify_images, resize_images
+from duckduckgo_search.exceptions import DuckDuckGoSearchException
 from fastai.data.transforms import get_image_files
+from fastai.vision.utils import download_images, resize_images, verify_images
+from fastcore.foundation import L
 
 
 def search_images(term, max_images=128):
-    """ Search term and return list of urls from duckduckgo with an optional max amount.
+    """Search term and return list of urls from duckduckgo with an optional max amount.
 
     author mango: https://www.kaggle.com/mrmangoes
     :param term: String term to search.
@@ -26,12 +27,21 @@ def search_images(term, max_images=128):
     print(f"searching for '{term}'")
     keywords = term
     ddgs_images = ddgs.images(keywords)
-    limited_images = list(islice(ddgs_images, max_images))
-    return L(limited_images).itemgot('image')
+    limited_images = []
+    image_iter = islice(ddgs_images, max_images)
+    while True:
+        try:
+            limited_images.append(next(image_iter))
+        except StopIteration:
+            break
+        except DuckDuckGoSearchException as e:
+            print("Exception Raised", e)
+
+    return L(limited_images).itemgot("image")
 
 
 def delete_failed_images(images_path):
-    """ Delete failed images
+    """Delete failed images
 
     :param images_path: Path object containing the potentially failed images are.
     :return: Number of images failed, return -1 for exception
@@ -40,7 +50,7 @@ def delete_failed_images(images_path):
         failed = verify_images(get_image_files(images_path))
         failed.map(Path.unlink, missing_ok=True)
         num_failed = len(failed)
-        print(f'Failed images: {num_failed}')
+        print(f"Failed images: {num_failed}")
         return num_failed
     except PermissionError:
         return -1
@@ -74,9 +84,11 @@ def download_images_for_categories(category_paths, subjects=None, max_size=400):
         :param primary: Primary search string, placed in front.
         :param secondary: (Optional) Secondary search string, placed in back.
         """
-        found_urls = search_images(f'{primary}{"" if len(secondary) else " "}{secondary}')
+        found_urls = search_images(
+            f'{primary}{"" if len(secondary) != 0 else " "}{secondary}'
+        )
         image_urls = [url for url in found_urls if is_url_image(url)]
-        print(f'Downloading {len(image_urls)} images.')
+        print(f"Downloading {len(image_urls)} images.")
         download_images(category_path, urls=image_urls)
         sleep(10)
 
@@ -93,7 +105,7 @@ def download_images_for_categories(category_paths, subjects=None, max_size=400):
 
 
 def create_category_directories(categories, path):
-    """ Create directories for each category in the specified base path.
+    """Create directories for each category in the specified base path.
 
     :param categories: A list of category names (strings).
     :param path: Path object containing the base directory where the category directories will be created.
@@ -111,19 +123,22 @@ def create_category_directories(categories, path):
 
 
 def path_contains_images(path):
-    """ Check if given directory contains image files at that directory level (.jpg, .png, .jpeg, .gif, .bmp)
+    """Check if given directory contains image files at that directory level (.jpg, .png, .jpeg, .gif, .bmp)
 
     :param path: Path object containing the directory of the images
     :return: True if any images in path
     """
     try:
-        return any(file.suffix.lower() in {'.jpg', '.png', '.jpeg', '.gif', '.bmp'} for file in path.rglob('*'))
+        return any(
+            file.suffix.lower() in {".jpg", ".png", ".jpeg", ".gif", ".bmp"}
+            for file in path.rglob("*")
+        )
     except FileNotFoundError:
         return False
 
 
 def is_images_setup(paths):
-    """ Checks paths to see if the images are already setup
+    """Checks paths to see if the images are already setup
 
     :param paths: List of Path objects containing the directory of the category to check for images
     :return: True if every directory has images false if not
