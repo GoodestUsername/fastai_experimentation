@@ -1,16 +1,41 @@
 """Module containing driver function and methods for fastai sandbox"""
-import random
+import logging
 import platform
-import torch
-
+import random
+import shutil
+import sys
+import traceback
 from pathlib import Path
+
+import fastai.vision as vision
+import torch
+from fastai.vision.all import (
+    CategoryBlock,
+    ClassificationInterpretation,
+    DataBlock,
+    ImageBlock,
+    ImageDataLoaders,
+    PILImage,
+    RandomResizedCrop,
+    RandomSplitter,
+    Resize,
+    URLs,
+    aug_transforms,
+    error_rate,
+    get_image_files,
+    parent_label,
+    resnet34,
+    untar_data,
+    vision_learner,
+)
+from matplotlib import pyplot
 from PIL import Image
-
-from fastcore.all import *
-from fastai.vision.all import *
-
+from setup_utils import (
+    create_category_directories,
+    download_images_for_categories,
+    is_images_setup,
+)
 from torchvision.models import resnet18
-from setup_utils import create_category_directories, download_images_for_categories, is_images_setup
 
 
 def try_random_image(learn, test_set_path):
