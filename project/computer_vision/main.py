@@ -149,12 +149,13 @@ def cat_vs_dog_model(models_path):
     return learn
 
 
-def bear_model_random_resized_crop():
+def bear_model_random_resized_crop(models_path):
     """Finetune the resnet32 model for types of bears, grizzly, black, teddy labels
 
     :return: Fastai Learner object
     """
 
+    model_path = models_path / "bear1.pkl"
     images_path = Path("./images/bear")
     images_path.mkdir(exist_ok=True, parents=True)
     categories = ["grizzly bear", "black bear", "teddy bear"]
@@ -164,7 +165,14 @@ def bear_model_random_resized_crop():
         print("images already downloaded")
     else:
         print("downloading images from duckduckgo")
-        download_images_for_categories(category_paths)
+        # noinspection PyBroadException
+        try:
+            download_images_for_categories(category_paths)
+        except Exception:
+            print("Something failed.")
+            shutil.rmtree(images_path)
+            logging.error(traceback.format_exc())
+            sys.exit(1)
 
     bears = DataBlock(
         blocks=[ImageBlock, CategoryBlock],
@@ -172,16 +180,39 @@ def bear_model_random_resized_crop():
         splitter=RandomSplitter(seed=42),
         get_y=parent_label,
         item_tfms=[Resize(192)],
-        batch_tfms=aug_transforms(size=192, min_scale=0.75)
+        batch_tfms=aug_transforms(size=192, min_scale=0.75),
     )
-    bears = bears.new(item_tfms=[RandomResizedCrop(128, min_scale=0.3)])
-    dls = bears.dataloaders(images_path)
-    dls.train.show_batch(max_n=4, nrows=1, unique=True)
-    # dls = bears.dataloaders(images_path)
-    # learn = vision_learner(dls, resnet34, metrics=error_rate, model_dir=models_path)
-    # learn.fine_tune(1)
-    # learn.export('cat_vs_dog1.pkl')
-    # return learn
+    # bears = bears.new(item_tfms=[RandomResizedCrop(128, min_scale=0.3)])
+    # bears = bears.new(item_tfms=Resize(128, ResizeMethod.Squish))
+    # bears = bears.new(item_tfms=Resize(128, ResizeMethod.pad, pad_mode='zeros'))
+    # bears = bears.new(item_tfms=[Resize(128)], batch_tfms=aug_transforms(mult=2))
+
+    # Default crops image to square
+    bears = bears.new(
+        item_tfms=[RandomResizedCrop(128, min_scale=0.3)],
+        batch_tfms=aug_transforms(mult=2),
+    )
+    dls = bears.dataloaders(images_path, num_workers=0)
+    learn = vision_learner(dls, resnet34, metrics=error_rate, model_dir=model_path)
+
+    if not model_path.is_file():
+        # Show batch before training
+        # dls.train.show_batch(max_n=4, nrows=1, unique=True)
+        # pyplot.show()
+        learn.fine_tune(4)
+        learn.export(model_path)
+
+    return learn
+
+
+def interp_experimentation(model):
+    """
+    Random things pertaining to using ClassificationInterpretation on a model.
+    """
+    interp = ClassificationInterpretation.from_learner(model)
+    # interp.plot_confusion_matrix()
+    interp.plot_top_losses(5, nrows=1)
+    pyplot.show()
 
 
 def main():
@@ -195,6 +226,9 @@ def main():
     print(f"Current OS: {os_name}")
 
     models_path = Path("./models")
+    bear_model = bear_model_random_resized_crop(models_path)
+    # try_random_image(bear_model, Path('./images/bear/teddy bear'))
+
     return 0
 
 
