@@ -98,6 +98,16 @@ def bird_vs_forest_model(models_path):
         images_path, bs=32, num_workers=0
     )  # not sure what to set this to right now. needs to be 0 on windows
 
+    learn = vision.vision_learner(
+        dls, resnet18, metrics=error_rate, model_dir=model_path
+    )
+    if not model_path.is_file():
+        # Show batch before training
+        # dls.train.show_batch(max_n=4, nrows=1, unique=True)
+        # pyplot.show()
+        # dls.show_batch(max_n=6)
+        learn.fine_tune(3)
+        learn.export(model_path)
     return learn
 
 
@@ -115,8 +125,9 @@ def cat_vs_dog_model(models_path):
 
     :return: Fastai Learner object
     """
+    model_path = models_path / "cat_vs_dog1.pkl"
 
-    path = untar_data(URLs.PETS) / 'images'
+    path = untar_data(URLs.PETS) / "images"
     dls = ImageDataLoaders.from_name_func(
         models_path,
         get_image_files(path),
@@ -128,9 +139,13 @@ def cat_vs_dog_model(models_path):
         num_workers=0,
     )
 
-    learn = vision_learner(dls, resnet34, metrics=error_rate, model_dir=models_path)
-    learn.fine_tune(1)
-    learn.export('cat_vs_dog1.pkl')
+    learn = vision_learner(dls, resnet34, metrics=error_rate, model_dir=model_path)
+    if not model_path.is_file():
+        # Show batch before training
+        # dls.train.show_batch(max_n=4, nrows=1, unique=True)
+        # pyplot.show()
+        learn.fine_tune(1)
+        learn.export(model_path)
     return learn
 
 
