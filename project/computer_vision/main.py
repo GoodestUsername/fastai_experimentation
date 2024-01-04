@@ -71,7 +71,7 @@ def bird_vs_forest_model(models_path):
     """Finetune resnet18 for bird vs forest labels.
 
     :param models_path: Path object for models directory to save fine-tuned model.
-    :return: Tuple with Fastai Learner object, dictionary of category image paths.
+    :return: Fastai Learner object.
     """
     model_path = models_path / "bird_vs_forest1.pkl"
 
@@ -98,11 +98,7 @@ def bird_vs_forest_model(models_path):
         images_path, bs=32, num_workers=0
     )  # not sure what to set this to right now. needs to be 0 on windows
 
-    dls.show_batch(max_n=6)
-    learn = vision_learner(dls, resnet18, metrics=error_rate)
-    learn.fine_tune(3)
-    learn.export(models_path / 'bird_vs_forest1.pkl')
-    return learn, category_paths
+    return learn
 
 
 def cat_vs_dog_label_func(animal):
