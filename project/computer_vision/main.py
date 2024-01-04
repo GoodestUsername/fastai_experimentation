@@ -40,16 +40,16 @@ from torchvision.models import resnet18
 
 def try_random_image(learn, test_set_path):
     """
-    Randomly selects an image from the test set, predicts its label, and displays the image.
+    Randomly selects an image from the test set, predicts its label, displays the image.
 
     :param learn: Fastai Learner object.
     :param test_set_path: Path object of the directory containing the test set images.
-    :return: Tuple with label, label_index, probabilities list, return -1 if no images found in the directory.
+    :return: Tuple with label, label_index, probabilities list.
     """
     image_paths = list(test_set_path.glob("*"))
     if not image_paths:
         print("No images found in the specified directory.")
-        return -1
+        return
 
     random_image_path = random.choice(image_paths)
     print(f"File name: {random_image_path}.")
