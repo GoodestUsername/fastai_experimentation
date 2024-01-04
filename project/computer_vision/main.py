@@ -68,15 +68,17 @@ def try_random_image(learn, test_set_path):
 
 
 def bird_vs_forest_model(models_path):
-    """ Finetune resnet18 for bird vs forest labels.
+    """Finetune resnet18 for bird vs forest labels.
 
     :param models_path: Path object for models directory to save fine-tuned model.
     :return: Tuple with Fastai Learner object, dictionary of category image paths.
     """
-    images_path = Path('./images')
+    model_path = models_path / "bird_vs_forest1.pkl"
 
-    categories = ['bird', 'forest']
-    subjects = ['photo', 'sun photo', 'shade photo']
+    images_path = Path("./images")
+
+    categories = ["bird", "forest"]
+    subjects = ["photo", "sun photo", "shade photo"]
     category_paths = create_category_directories(categories, images_path)
 
     if is_images_setup(category_paths.values()):
@@ -90,9 +92,11 @@ def bird_vs_forest_model(models_path):
         get_items=get_image_files,
         splitter=RandomSplitter(seed=42),
         get_y=parent_label,
-        item_tfms=[Resize(192, method='squish')],
-        batch_tfms=aug_transforms(size=192, min_scale=0.75)
-    ).dataloaders(images_path, bs=32, num_workers=0)  # not sure what to set this to right now. needs to be 0 on windows
+        item_tfms=[Resize(192, method="squish")],
+        batch_tfms=aug_transforms(size=192, min_scale=0.75),
+    ).dataloaders(
+        images_path, bs=32, num_workers=0
+    )  # not sure what to set this to right now. needs to be 0 on windows
 
     dls.show_batch(max_n=6)
     learn = vision_learner(dls, resnet18, metrics=error_rate)
@@ -102,7 +106,7 @@ def bird_vs_forest_model(models_path):
 
 
 def cat_vs_dog_label_func(animal):
-    """ Return label of the prediction.
+    """Return label of the prediction.
 
     :param animal: Fastai predict output of the image given.
     :return: label in uppercase
@@ -111,7 +115,7 @@ def cat_vs_dog_label_func(animal):
 
 
 def cat_vs_dog_model(models_path):
-    """ Finetune the resnet32 model for cats vs dog labels
+    """Finetune the resnet32 model for cats vs dog labels
 
     :return: Fastai Learner object
     """
@@ -125,7 +129,7 @@ def cat_vs_dog_model(models_path):
         label_func=cat_vs_dog_label_func,
         item_tfms=Resize(224),
         batch_tfms=aug_transforms(size=224, min_scale=0.75),
-        num_workers=0
+        num_workers=0,
     )
 
     learn = vision_learner(dls, resnet34, metrics=error_rate, model_dir=models_path)
@@ -135,14 +139,14 @@ def cat_vs_dog_model(models_path):
 
 
 def bear_model_random_resized_crop():
-    """ Finetune the resnet32 model for types of bears, grizzly, black, teddy labels
+    """Finetune the resnet32 model for types of bears, grizzly, black, teddy labels
 
     :return: Fastai Learner object
     """
 
-    images_path = Path('./images/bear')
+    images_path = Path("./images/bear")
     images_path.mkdir(exist_ok=True, parents=True)
-    categories = ['grizzly', 'black', 'teddy']
+    categories = ["grizzly bear", "black bear", "teddy bear"]
     category_paths = create_category_directories(categories, images_path)
 
     if is_images_setup(category_paths.values()):
@@ -175,12 +179,11 @@ def main():
     :return: 0
     """
     os_name = platform.system()
-    print(f'NVIDIA GPU available: {torch.cuda.is_available()}')
-    print(f'Current cuda device: {torch.cuda.current_device()}')
-    print(f'Current OS: {os_name}')
+    print(f"NVIDIA GPU available: {torch.cuda.is_available()}")
+    print(f"Current cuda device: {torch.cuda.current_device()}")
+    print(f"Current OS: {os_name}")
 
-    model_path = Path('./models')
-    bear_model_random_resized_crop()
+    models_path = Path("./models")
     return 0
 
 
